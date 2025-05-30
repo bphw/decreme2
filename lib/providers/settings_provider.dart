@@ -19,6 +19,14 @@ class SettingsNotifier extends StateNotifier<AsyncValue<Map<String, String>>> {
       final Map<String, String> defaultSettings = {
         'is_activate_fingerprint': 'false',
         'is_use_tax': 'false',
+        'is_demo_mode': 'false',
+        'store_name': '',
+        'store_address': '',
+        'store_contact': '',
+        'invoice_bank': '',
+        'invoice_bank_account_holder': '',
+        'invoice_bank_account_number': '',
+        'invoice_due_date_in_days': '7',
       };
 
       try {
@@ -35,33 +43,42 @@ class SettingsNotifier extends StateNotifier<AsyncValue<Map<String, String>>> {
             final value = item['setting_value'];
 
             if (name != null) {
-              // Convert null or non-string values to boolean strings
-              if (value == null) {
-                settings[name] = 'false';
+              // Handle boolean settings
+              if (name.startsWith('is_')) {
+                if (value == null) {
+                  settings[name] = 'false';
+                } else {
+                  final stringValue = value.toString().toLowerCase();
+                  settings[name] = (stringValue == 'true') ? 'true' : 'false';
+                }
               } else {
-                // Convert any non-null value to string and check if it's 'true'
-                final stringValue = value.toString().toLowerCase();
-                settings[name] = (stringValue == 'true') ? 'true' : 'false';
+                // Handle text settings
+                settings[name] = value?.toString() ?? '';
               }
             }
           }
 
           state = AsyncValue.data(settings);
         } else {
-          // If response is null or not a List, use default settings
           state = AsyncValue.data(defaultSettings);
         }
       } catch (e) {
         print('Error parsing settings: $e');
-        // If there's an error parsing, use default settings
         state = AsyncValue.data(defaultSettings);
       }
     } catch (error, stackTrace) {
       print('Error loading settings: $error');
-      // On error, still provide default settings instead of error state
       state = AsyncValue.data({
         'is_activate_fingerprint': 'false',
         'is_use_tax': 'false',
+        'is_demo_mode': 'false',
+        'store_name': '',
+        'store_address': '',
+        'store_contact': '',
+        'invoice_bank': '',
+        'invoice_bank_account_holder': '',
+        'invoice_bank_account_number': '',
+        'invoice_due_date_in_days': '7',
       });
     }
   }
@@ -72,20 +89,30 @@ class SettingsNotifier extends StateNotifier<AsyncValue<Map<String, String>>> {
       final currentSettings = state.value ?? {
         'is_activate_fingerprint': 'false',
         'is_use_tax': 'false',
+        'is_demo_mode': 'false',
+        'store_name': '',
+        'store_address': '',
+        'store_contact': '',
+        'invoice_bank': '',
+        'invoice_bank_account_holder': '',
+        'invoice_bank_account_number': '',
+        'invoice_due_date_in_days': '7',
       };
       
-      // Convert value to boolean string
-      final boolValue = value.toLowerCase() == 'true' ? 'true' : 'false';
+      // For boolean settings, convert to boolean string
+      final stringValue = name.startsWith('is_') 
+          ? (value.toLowerCase() == 'true' ? 'true' : 'false')
+          : value;
       
       // Optimistically update the UI
-      state = AsyncValue.data({...currentSettings, name: boolValue});
+      state = AsyncValue.data({...currentSettings, name: stringValue});
 
       // Update in database
       await SupabaseConfig.client
           .from('settings')
           .upsert({
             'name': name,
-            'setting_value': boolValue,
+            'setting_value': stringValue,
           })
           .eq('name', name);
       
@@ -99,7 +126,7 @@ class SettingsNotifier extends StateNotifier<AsyncValue<Map<String, String>>> {
 
   String getSetting(String name) {
     final settings = state.value;
-    return settings?[name] ?? 'false';
+    return settings?[name] ?? '';
   }
 
   bool getBoolSetting(String name) {

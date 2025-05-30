@@ -39,7 +39,7 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             ListTile(
               title: const Text('Use Tax'),
-              subtitle: const Text('Enable 11% tax calculation'),
+              subtitle: const Text('Enable 10% tax calculation'),
               trailing: Switch(
                 value: settings['is_use_tax'] == 'true',
                 onChanged: (value) {
@@ -62,9 +62,21 @@ class SettingsScreen extends ConsumerWidget {
             ),
             const Divider(),
             ListTile(
+              title: const Text('Demo Mode'),
+              subtitle: const Text('Enable demo mode features'),
+              trailing: Switch(
+                value: settings['is_demo_mode'] == 'true',
+                onChanged: (value) {
+                  ref.read(settingsProvider.notifier)
+                    .updateSetting('is_demo_mode', value.toString());
+                },
+              ),
+            ),
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.settings),
               title: const Text('Settings Preference'),
-              subtitle: const Text('Manage your preferences'),
+              subtitle: const Text('Manage store and invoice settings'),
               onTap: () {
                 Navigator.push(
                   context,

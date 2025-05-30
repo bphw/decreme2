@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/models.dart';
 import 'cart_provider.dart';
+import 'settings_provider.dart';
 
 final orderProvider = StateNotifierProvider<OrderNotifier, AsyncValue<void>>((ref) {
   return OrderNotifier(ref);
@@ -91,9 +92,26 @@ final ordersProvider = FutureProvider<List<Order>>((ref) async {
 
     if (response == null) return [];
 
-    return (response as List)
+    final orders = (response as List)
         .map((json) => Order.fromJson(json))
         .toList();
+
+    // Check if we're in demo mode
+    final settings = ref.read(settingsProvider);
+    final isDemoMode = settings.when(
+      loading: () => false,
+      error: (_, __) => false,
+      data: (settings) => settings['is_demo_mode'] == 'true',
+    );
+
+    if (isDemoMode) {
+      // In demo mode, limit pending orders to 5
+      final pendingOrders = orders.where((o) => o.status == OrderStatus.pending).take(5).toList();
+      final otherOrders = orders.where((o) => o.status != OrderStatus.pending).toList();
+      return [...pendingOrders, ...otherOrders];
+    }
+
+    return orders;
   } catch (e) {
     print('Error fetching orders: $e');
     throw e;

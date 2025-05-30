@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PrivacyPolicyBottomSheet extends StatefulWidget {
   const PrivacyPolicyBottomSheet({super.key});
@@ -9,6 +10,20 @@ class PrivacyPolicyBottomSheet extends StatefulWidget {
 
 class _PrivacyPolicyBottomSheetState extends State<PrivacyPolicyBottomSheet> {
   bool isExpanded = false;
+
+  Future<void> _launchUrl() async {
+    final Uri url = Uri.parse('https://bambangp.vercel.app');
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not launch website'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +183,23 @@ class _PrivacyPolicyBottomSheetState extends State<PrivacyPolicyBottomSheet> {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'If you have any questions about this Privacy Policy, please contact us at support@example.com.',
+                        'If you have any questions about this Privacy Policy, please contact us at bambanx@protonmail.com.',
                       ),
                     ],
+                  ),
+                ),
+              ),
+              // Website link
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: InkWell(
+                  onTap: _launchUrl,
+                  child: Text(
+                    'Please visit https://bambangp.vercel.app for more details',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 ),
               ),

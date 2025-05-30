@@ -7,6 +7,7 @@ import 'screens/main_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'providers/auth_provider.dart';
+import 'providers/settings_provider.dart';
 import 'config/environment.dart';
 
 void main() {
@@ -39,9 +40,15 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final initialization = ref.watch(initializationProvider);
+    final settingsAsync = ref.watch(settingsProvider);
 
     return MaterialApp(
       title: 'Decreme App',
+      debugShowCheckedModeBanner: settingsAsync.when(
+        loading: () => false,
+        error: (_, __) => false,
+        data: (settings) => settings['is_demo_mode'] == 'true',
+      ),
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
