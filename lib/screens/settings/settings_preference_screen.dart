@@ -51,7 +51,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Store Name',
                 settings['store_name'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('store_name', value),
+                    .updateSettingPreference('store_name', value),
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -59,7 +59,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Store Address',
                 settings['store_address'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('store_address', value),
+                    .updateSettingPreference('store_address', value),
                 maxLines: 3,
               ),
               const SizedBox(height: 16),
@@ -68,7 +68,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Store Contact',
                 settings['store_contact'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('store_contact', value),
+                    .updateSettingPreference('store_contact', value),
               ),
               const SizedBox(height: 32),
               const Text(
@@ -84,7 +84,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Bank Name',
                 settings['invoice_bank'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('invoice_bank', value),
+                    .updateSettingPreference('invoice_bank', value),
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -92,7 +92,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Bank Account Holder',
                 settings['invoice_bank_account_holder'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('invoice_bank_account_holder', value),
+                    .updateSettingPreference('invoice_bank_account_holder', value),
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -100,7 +100,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Bank Account Number',
                 settings['invoice_bank_account_number'] ?? '',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('invoice_bank_account_number', value),
+                    .updateSettingPreference('invoice_bank_account_number', value),
                 keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
@@ -109,7 +109,7 @@ class SettingsPreferenceScreen extends ConsumerWidget {
                 'Invoice Expiry Days',
                 settings['invoice_due_date_in_days'] ?? '7',
                 (value) => ref.read(settingsProvider.notifier)
-                    .updateSetting('invoice_due_date_in_days', value),
+                    .updateSettingPreference('invoice_due_date_in_days', value),
                 keyboardType: TextInputType.number,
               ),
             ],
