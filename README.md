@@ -9,6 +9,7 @@ For getting more information, visit
 
 ## Download
 For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/Ebw8sJXv-SRFsRhqPbnoof8BStm07LMtjh5QMl7SQkT1iQ?e=PqOwfe).
+Use `lebima2112@claspira.com` as username and `arikey` as password.
 
 ## Capability
 Apps is able to:
