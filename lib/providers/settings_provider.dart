@@ -151,12 +151,26 @@ class SettingsNotifier extends StateNotifier<AsyncValue<Map<String, String>>> {
       state = AsyncValue.data({...currentSettings, name: value});
 
       // Update in database
-      await SupabaseConfig.client
+      final response = await SupabaseConfig.client
           .from('settings')
           .update({
             'setting_value': value,
+            'updated_at': DateTime.now().toIso8601String(),
           })
-          .eq('name', name);
+          .eq('name', name)
+          .select();
+
+      if (response == null || response.isEmpty) {
+        // If no record exists, insert it
+        await SupabaseConfig.client
+            .from('settings')
+            .insert({
+              'name': name,
+              'setting_value': value,
+              'created_at': DateTime.now().toIso8601String(),
+              'updated_at': DateTime.now().toIso8601String(),
+            });
+      }
       
     } catch (error) {
       print('Error updating setting preference: $error');
