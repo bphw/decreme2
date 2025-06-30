@@ -7,6 +7,18 @@ This project is extended version of [initial](https://github.com/bphw/decreme) a
 For getting more information, visit
 [Bambang's page](https://bambangp.vercel.app/)
 
+## Environment Setup
+Before running the app, you need to set up your environment variables:
+
+1. Create a `.env` file in the project root
+2. Add your Supabase credentials:
+```
+SUPABASE_URL=your_supabase_project_url_here
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
+```
+
+**Important**: Never commit the `.env` file to version control. It's already added to `.gitignore`.
+
 ## Download
 For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/Ebw8sJXv-SRFsRhqPbnoof8BStm07LMtjh5QMl7SQkT1iQ?e=PqOwfe).
 Use `lebima2112@claspira.com` as username and `arikey` as password.
