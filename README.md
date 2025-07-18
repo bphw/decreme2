@@ -20,13 +20,13 @@ SUPABASE_ANON_KEY=your_supabase_anon_key_here
 **Important**: Never commit the `.env` file to version control. It's already added to `.gitignore`.
 
 ## Download
-For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/Ebw8sJXv-SRFsRhqPbnoof8BStm07LMtjh5QMl7SQkT1iQ?e=PqOwfe).
+For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/ESFHnxMoFfxMhQD1lFPuM34B5_C5P4k-9Tqh3Nc4Cfe0tQ?e=ACgtgG).
 Use `lebima2112@claspira.com` as username and `arikey` as password.
 
 ## Capability
 Apps is able to:
 - Order management
-- Invoice generation
+- Invoice generation (single and monthly inquiry)
 - Share invoice
 - Track order
 

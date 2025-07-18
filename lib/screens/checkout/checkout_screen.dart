@@ -292,7 +292,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('Delivery Fee'),
-                          Text('Rp ${_deliveryFeeController.text}'),
+                          SizedBox(
+                            width: 120,
+                            child: TextFormField(
+                              controller: _deliveryFeeController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                prefixText: 'Rp ',
+                                border: OutlineInputBorder(),
+                                isDense: true,
+                                contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                              ),
+                              onChanged: (value) {
+                                ref.read(cartProvider.notifier).setDeliveryFee(value.isEmpty ? '0' : value);
+                              },
+                            ),
+                          ),
                         ],
                       ),
                       const Divider(),

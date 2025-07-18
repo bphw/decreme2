@@ -25,12 +25,13 @@ final initializationProvider = FutureProvider<void>((ref) async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Supabase
-  await Supabase.initialize(
-    url: SupabaseConfig.url,
-    anonKey: SupabaseConfig.anonKey,
-  );
+  // await Supabase.initialize(
+  //   url: SupabaseConfig.url,
+  //   anonKey: SupabaseConfig.anonKey,
+  // );
 
   // Initialize Notifications
+  await SupabaseConfig.initialize();
   await NotificationService.initialize();
 });
 
@@ -109,10 +110,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cake Order App'),
+        title: const Text('Decreme Cake Order App'),
       ),
       body: const Center(
-        child: Text('Welcome to Cake Order App'),
+        child: Text('Welcome to Decreme Cake Order App'),
       ),
     );
   }

@@ -6,6 +6,10 @@ import '../../providers/order_provider.dart';
 import 'order_detail_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/supabase_config.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 
 class OrdersScreen extends ConsumerStatefulWidget {
   const OrdersScreen({super.key});
@@ -16,6 +20,7 @@ class OrdersScreen extends ConsumerStatefulWidget {
 
 class _OrdersScreenState extends ConsumerState<OrdersScreen> {
   OrderStatus? _selectedStatus;
+  DateTimeRange? selectedRange;
 
   String formatPrice(dynamic price) {
     final formatter = NumberFormat('#,###', 'id_ID');
@@ -77,6 +82,144 @@ ${order.notes != null ? 'Notes: ${order.notes}' : ''}
     }
   }
 
+  Future<List<Order>> _fetchOrdersForClientAndRange(String clientId, DateTimeRange range) async {
+    final response = await SupabaseConfig.client
+        .from('orders')
+        .select()
+        .eq('client_id', clientId)
+        .gte('created_at', range.start.toIso8601String())
+        .lte('created_at', range.end.toIso8601String());
+    return (response as List).map((json) => Order.fromJson(json)).toList();
+  }
+
+  Future<void> _generateAndShareInvoice(Client client, DateTimeRange range) async {
+    final orders = await _fetchOrdersForClientAndRange(client.id.toString(), range);
+    if (orders.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No orders found for this client and date range.')),
+      );
+      return;
+    }
+
+    Uint8List? logoBytes;
+    if (client.logo != null && client.logo!.isNotEmpty) {
+      logoBytes = await networkImageToBytes(client.logo!);
+    }
+
+    final pdf = pw.Document();
+    final total = orders.fold<double>(0, (sum, o) => sum + o.totalAmount.toDouble());
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            if (logoBytes != null)
+              pw.Center(
+                child: pw.Image(
+                  pw.MemoryImage(logoBytes),
+                  height: 60,
+                ),
+              ),
+            pw.SizedBox(height: 8),
+            pw.Text('Invoice for Client: ${client.name}', style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+            if (client.phone != null && client.phone.isNotEmpty)
+              pw.Text('Phone: ${client.phone}'),
+            pw.Text('Period: ${DateFormat('dd MMM yyyy').format(range.start)} - ${DateFormat('dd MMM yyyy').format(range.end)}'),
+            pw.SizedBox(height: 16),
+            pw.Table.fromTextArray(
+              headers: ['Order #', 'Date', 'Total'],
+              data: orders.map((o) => [
+                o.orderNumber.toString(),
+                DateFormat('dd MMM yyyy').format(o.createdAt),
+                'Rp ${formatPrice(o.totalAmount)}',
+              ]).toList(),
+            ),
+            pw.SizedBox(height: 16),
+            pw.Text('Total: Rp ${formatPrice(total)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+
+    final pdfBytes = await pdf.save();
+    await Printing.sharePdf(bytes: pdfBytes, filename: 'invoice.pdf');
+  }
+
+  Future<List<Client>> _fetchClients() async {
+    final response = await SupabaseConfig.client
+        .from('clients')
+        .select('*');
+    return (response as List).map((json) => Client.fromJson(json)).toList();
+  }
+
+  Future<void> _showInvoiceDialog(BuildContext context) async {
+    // Fetch clients from your provider or Supabase
+    final clients = await _fetchClients();
+    Client? selectedClient;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Generate Invoice'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButtonFormField<Client>(
+                decoration: const InputDecoration(labelText: 'Client'),
+                items: clients.map((client) => DropdownMenuItem<Client>(
+                  value: client,
+                  child: Text(client.name),
+                )).toList(),
+                onChanged: (value) => selectedClient = value,
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  final now = DateTime.now();
+                  final picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2020),
+                    lastDate: now,
+                    initialDateRange: selectedRange ??
+                        DateTimeRange(
+                          start: now.subtract(const Duration(days: 7)),
+                          end: now,
+                        ),
+                  );
+                  if (picked != null) {
+                    selectedRange = picked;
+                    // Optionally, call setState or use a StatefulBuilder to update the UI
+                  }
+                },
+                child: Text(
+                  selectedRange == null
+                      ? 'Select Date Range'
+                      : '${DateFormat('dd MMM yyyy').format(selectedRange!.start)} - ${DateFormat('dd MMM yyyy').format(selectedRange!.end)}',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (selectedClient != null && selectedRange != null) {
+                  Navigator.pop(context);
+                  await _generateAndShareInvoice(selectedClient!, selectedRange!);
+                }
+              },
+              child: const Text('Generate'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ordersAsync = ref.watch(ordersProvider);
@@ -85,6 +228,13 @@ ${order.notes != null ? 'Notes: ${order.notes}' : ''}
     return Scaffold(
       appBar: AppBar(
         title: const Text('Orders'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calendar_month),
+            tooltip: 'Generate Invoice',
+            onPressed: () => _showInvoiceDialog(context),
+          ),
+        ],
       ),
       body: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -241,4 +391,12 @@ ${order.notes != null ? 'Notes: ${order.notes}' : ''}
         return Colors.grey;
     }
   }
+} 
+
+Future<Uint8List> networkImageToBytes(String url) async {
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    return response.bodyBytes;
+  }
+  throw Exception('Failed to load image');
 } 

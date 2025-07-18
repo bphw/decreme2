@@ -99,6 +99,13 @@ class SettingsScreen extends ConsumerWidget {
                 );
               },
             ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('App Version'),
+              subtitle: Text('v${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}'),
+              enabled: false,
+            ),
           ],
         ),
       ),
