@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/settings_provider.dart';
+import '../../config/app_version.dart';
 import 'settings_preference_screen.dart';
 import 'privacy_policy_bottom_sheet.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -103,8 +105,33 @@ class SettingsScreen extends ConsumerWidget {
             ListTile(
               leading: const Icon(Icons.info_outline),
               title: const Text('App Version'),
-              subtitle: Text('v${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}'),
-              enabled: false,
+              subtitle: Text(
+                AppVersion.version,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              enabled: true,
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Decreme'),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Bams © 2025'),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ],
         ),

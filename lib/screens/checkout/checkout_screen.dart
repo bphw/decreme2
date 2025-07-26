@@ -105,7 +105,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             buyerName: _isStore ? _selectedStore!.name : _nameController.text,
             buyerPhone: _isStore ? _selectedStore!.phone : _phoneController.text,
             notes: _notesController.text,
-            clientId: _isStore ? _selectedStore!.id : null,
+            clientId: _isStore ? _selectedStore!.id : 3,
           );
 
       print('Order created successfully');

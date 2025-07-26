@@ -20,7 +20,7 @@ SUPABASE_ANON_KEY=your_supabase_anon_key_here
 **Important**: Never commit the `.env` file to version control. It's already added to `.gitignore`.
 
 ## Download
-For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/ESFHnxMoFfxMhQD1lFPuM34B5_C5P4k-9Tqh3Nc4Cfe0tQ?e=ACgtgG).
+For the apps demo, download [here](https://1drv.ms/u/c/fe1f339a228c67a7/Ed9czdfzDbhEidyTV-kgaDQBMY70ZT4tXlCkS0XrH5qo2Q?e=ROXpx7).
 Use `lebima2112@claspira.com` as username and `arikey` as password.
 
 ## Capability
